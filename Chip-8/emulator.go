@@ -1,6 +1,6 @@
-package chip8
+package emulator
 
-type Vm struct {
+type VM struct {
 	memory  [4096]uint8   // memory of 4kB
 	display [64][32]uint8 // display size 64x32 px
 	V       [16]uint8     // cpu register from V0 - VF
