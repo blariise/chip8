@@ -1,5 +1,6 @@
 #include <random>
 #include <chrono>
+#include <fstream>
 
 #include "Chip8.h"
 
@@ -59,4 +60,22 @@ void Chip8::init() {
     // Init RNG
     std::default_random_engine seed(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_int_distribution<unsigned char> randomByte = std::uniform_int_distribution<unsigned char>(1,255U);
+}
+
+void Chip8::loadRom(char const *filename) {
+
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+
+    if (file.is_open()) {
+        std::streampos size = file.tellg();
+        char *buffer = new char[size];
+        file.seekg(0, std::ios::beg);
+        file.read(buffer, size);
+        file.close();
+
+        for (int i{0}; i < size; ++i) {
+            memory[0x200 + i] = buffer[i];
+        }
+        delete[] buffer;
+    }
 }
