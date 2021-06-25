@@ -32,10 +32,8 @@ void Chip8::init() {
     SP = 0;
 
     // Clear the display
-    for (int i{0}; i < 64; ++i) {
-        for (int j{0}; j < 32; ++j) {
-           display[i][j] = 0; 
-        }
+    for (int i{0}; i < 2048; ++i) {   
+           display[i] = 0; 
     }
 
     // Clear the stack and registers V0-VF
@@ -59,7 +57,7 @@ void Chip8::init() {
 
     // Init RNG
     std::default_random_engine seed(std::chrono::system_clock::now().time_since_epoch().count());
-    std::uniform_int_distribution<unsigned char> randomByte = std::uniform_int_distribution<unsigned char>(1,255U);
+    randomByte = std::uniform_int_distribution<unsigned char>(1,255U);
 }
 
 void Chip8::loadRom(char const *filename) {
@@ -78,4 +76,197 @@ void Chip8::loadRom(char const *filename) {
         }
         delete[] buffer;
     }
+}
+
+void Chip8::cycle() {
+
+    //Fetch opcode
+    opcode = memory[PC] << 8 | memory[PC + 1]; 
+
+    PC += 2;
+
+    unsigned char nnn = opcode & 0x0FFF; // A 12-bit value, the lowest 12 bits of the instruction
+    unsigned char n = opcode & 0x000F; // A 4-bit value, the lowest 4 bits of the instruction
+    unsigned char x = opcode >> 8 & 0x000F; // A 4-bit value, the lower 4 bits of the high byte of the instruction
+    unsigned char y = opcode >> 4 & 0x000F; // A 4-bit value, the upper 4 bits of the low byte of the instruction
+    unsigned char kk = opcode >> 4 & 0x00FF; // An 8-bit value, the lowest 8 bits of the instruction
+    
+
+    switch (opcode & 0xF000) {
+        case 0:
+            if (opcode == 0x00E0) {
+                for (int i{0}; i < 2048; ++i) {
+                    display[i] = 0;
+                }
+            } else if (opcode == 0x00EE) {
+                --SP;
+                PC = stack[SP];
+            }
+            break;
+
+        case 0x1000:
+            PC = nnn; 
+            break;
+
+        case 0x2000:
+            stack[SP] = PC;
+            ++SP;
+            PC = nnn;
+            break;
+
+        case 0x3000:
+            if (V[x] = kk) {
+                PC += 2;
+            }
+            break;
+
+        case 0x4000:
+            if (V[x] != kk) {
+                PC += 2;
+            }
+            break;
+
+        case 0x5000:
+            if (V[x] = V[y]) {
+                PC += 2;
+            }
+            break;
+
+        case 0x6000:
+            V[x] = kk;
+            break;
+
+        case 0x7000:
+            V[x] += kk;
+            break;
+
+        case 0x8000:
+            switch (n) {
+                case 0x0000:
+                    V[x] = V[y];
+                    break;
+                
+                case 0x0001:
+                    V[x] |= V[y];
+                    break;
+                
+                case 0x0002:
+                    V[x] &= V[y];
+                    break;
+                
+                case 0x0003:
+                    V[x] != V[y];
+                    break;
+
+                case 0x0004:
+                    if(V[(opcode & 0x00F0) >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8])) {
+                        V[0xF] = 1;
+                    } else {
+                        V[0xF] = 0;
+                    }
+
+                    V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
+                    PC += 2;
+                    break;
+
+                case 0x0005:
+                    if (V[x] > V[y]) {
+                        V[0xF] = 1;
+                    } else {
+                        V[0xF] = 0;
+                    }
+
+                    V[x] -= V[y];
+                    break;
+
+                case 0x0006:
+                    V[0xF] = V[x] & 0x1U;
+	                V[x] >>= 1;
+                    break;
+
+                case 0x0007:
+                    if (V[y] > V[x]) {
+                        V[0xF] = 1;
+                    } else {
+                        V[0xF] = 0;
+                    }
+                    V[x] = V[y] - V[x];
+                    break;
+
+                case 0x000E:
+                    V[0xF] = V[x] & 0x80U >> 7U;
+	                V[x] <<= 1;
+                    break;
+                
+                default:
+                    exit(-1);
+            }
+        case 0x9000:
+            if (V[x] != V[y]) {
+                PC += 2;
+            }
+            break;
+        
+        case 0xA000:
+            I = nnn;
+            break;
+        
+        case 0xB000:
+            PC = nnn + V[0x0];
+            break;
+        
+        case 0xC000:
+            V[x] = randomByte(seed) & opcode & 0x00FFU;
+            break;
+
+        case 0xD000:
+            unsigned short x = V[(opcode & 0x0F00) >> 8];
+            unsigned short y = V[(opcode & 0x00F0) >> 4];
+            unsigned short height = opcode & 0x000F;
+            unsigned short pixel;
+
+            V[0xF] = 0;
+            for (int yLine = 0; yLine < height; yLine++) { 
+                pixel = memory[I + yLine];
+                for(int xLine = 0; xLine < 8; xLine++) {
+                    if((pixel & (0x80 >> xLine)) != 0) {
+                        if(display[(x + xLine + ((y + yLine) * 64))] == 1) {
+                            V[0xF] = 1;                                 
+                            display[x + xLine + ((y + yLine) * 64)] ^= 1;
+                        }
+                    }
+                }
+            }         
+            drawFlag = true;
+            PC += 2;
+            break;
+        
+        case 0xE000:
+            switch (opcode & 0x00FF) {
+                case 0x009E:
+                    if (keys[V[(opcode & 0x0F00u) >> 8u]]) {
+                        PC += 2;
+                    }
+                    break;
+                
+                case 0x00A1:
+                    if (!keys[V[(opcode & 0x0F00u) >> 8u]]) {
+                        PC += 2;
+                    }
+                    break;
+                
+                default:
+                    exit(-1);
+            }
+            break;
+        
+        case 0xF000:
+            switch (opcode & 0x00FF) {
+                case 0x0007:
+                    V[x] = delayTimer;
+
+                default:
+                    exit(-1);
+            }
+    } 
 }

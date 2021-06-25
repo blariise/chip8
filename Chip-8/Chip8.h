@@ -17,9 +17,13 @@ struct Chip8 {
 
 		void init(){};
 
+		std::default_random_engine seed;
+		std::uniform_int_distribution<unsigned char> randomByte;
+
 	public:
-		unsigned char display[64][32]{}; // display 64x32 px
+		unsigned char display[64 * 32]{}; // display 64x32 px
 		unsigned char keys[16]{}; // keypad
+		bool drawFlag{};
 		
 		Chip8();
 		~Chip8();
