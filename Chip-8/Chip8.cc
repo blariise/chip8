@@ -262,9 +262,66 @@ void Chip8::cycle() {
             switch (opcode & 0x00FF) {
                 case 0x0007:
                     V[x] = delayTimer;
+                    break;
 
+                case 0x000A:
+                    bool isKeyPressed{false};
+                    for (int i{0}; i < 16; ++i) {
+                        if (keys[i] != 0) {
+                            V[x] = I;
+                            isKeyPressed = true;
+                        }
+                    }
+                    if (!isKeyPressed) {
+                        return;
+                    }
+                    PC+=2;
+                    break;
+
+                case 0x0015:
+                    delayTimer = V[x];
+                    break;
+                
+                case 0x0018:
+                    soundTimer = V[x];
+                    break;
+
+                case 0x001E:
+                    if (I + V[x] > 0xFFF) {
+                        V[0xF] = 1;
+                    } else {
+                        V[0xF] = 0;
+                    }
+                    I += V[x];
+                    break;
+
+                case 0x0029:
+                    I = V[x] * 0x5;
+                    break;
+
+                case 0x0033:
+                    memory[I] = V[x] / 100;
+                    memory[I + 1] = (V[x] / 10) % 10;
+                    memory[I + 2] = (V[x] % 100) % 10;
+                    PC += 2;
+                    break;
+
+                case 0x0055:
+                    for (int i{0}; i <= x; ++i) {
+                        memory[I + i] = V[i];
+                    }
+                    break;
+
+                case 0x0065:
+                    for (int i{0}; i <= x; ++i) {
+                        V[i] = memory[I + i];
+                    }
+                    break;
                 default:
                     exit(-1);
             }
+            break;
+        default:
+            exit(-1);
     } 
 }
