@@ -85,11 +85,11 @@ void Chip8::cycle() {
 
     PC += 2;
 
-    unsigned char nnn = opcode & 0x0FFF; // A 12-bit value, the lowest 12 bits of the instruction
+    unsigned char nnn = opcode & 0x0FFFU; // A 12-bit value, the lowest 12 bits of the instruction
     unsigned char n = opcode & 0x000F; // A 4-bit value, the lowest 4 bits of the instruction
-    unsigned char x = opcode >> 8 & 0x000F; // A 4-bit value, the lower 4 bits of the high byte of the instruction
-    unsigned char y = opcode >> 4 & 0x000F; // A 4-bit value, the upper 4 bits of the low byte of the instruction
-    unsigned char kk = opcode >> 4 & 0x00FF; // An 8-bit value, the lowest 8 bits of the instruction
+    unsigned char x = (opcode & 0x0F00U) >> 8U; // A 4-bit value, the lower 4 bits of the high byte of the instruction
+    unsigned char y = (opcode & 0x00F0U) >> 4U; // A 4-bit value, the upper 4 bits of the low byte of the instruction
+    unsigned char kk = opcode & 0x00FFU; // An 8-bit value, the lowest 8 bits of the instruction
     
 
     switch (opcode & 0xF000) {
