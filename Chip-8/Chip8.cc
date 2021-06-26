@@ -115,7 +115,7 @@ void Chip8::cycle() {
             break;
 
         case 0x3000:
-            if (V[x] = kk) {
+            if (V[x] == kk) {
                 PC += 2;
             }
             break;
@@ -127,7 +127,7 @@ void Chip8::cycle() {
             break;
 
         case 0x5000:
-            if (V[x] = V[y]) {
+            if (V[x] == V[y]) {
                 PC += 2;
             }
             break;
@@ -155,7 +155,7 @@ void Chip8::cycle() {
                     break;
                 
                 case 0x0003:
-                    V[x] != V[y];
+                    V[x] ^= V[y];
                     break;
 
                 case 0x0004:
@@ -216,14 +216,12 @@ void Chip8::cycle() {
             break;
         
         case 0xC000:
-            V[x] = randomByte(seed) & opcode & 0x00FFU;
+            V[x] = randomByte(seed) & kk;
             break;
 
         case 0xD000:
-            unsigned short x = V[(opcode & 0x0F00) >> 8];
-            unsigned short y = V[(opcode & 0x00F0) >> 4];
-            unsigned short height = opcode & 0x000F;
-            unsigned short pixel;
+            unsigned short height = n;
+            unsigned short pixel{};
 
             V[0xF] = 0;
             for (int yLine = 0; yLine < height; yLine++) { 
@@ -244,13 +242,13 @@ void Chip8::cycle() {
         case 0xE000:
             switch (opcode & 0x00FF) {
                 case 0x009E:
-                    if (keys[V[(opcode & 0x0F00u) >> 8u]]) {
+                    if (keys[V[x]]) {
                         PC += 2;
                     }
                     break;
                 
                 case 0x00A1:
-                    if (!keys[V[(opcode & 0x0F00u) >> 8u]]) {
+                    if (!keys[V[y]]) {
                         PC += 2;
                     }
                     break;
