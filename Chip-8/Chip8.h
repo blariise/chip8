@@ -15,7 +15,7 @@ struct Chip8 {
 		unsigned char delayTimer{};
 		unsigned char soundTimer{};
 
-		void init(){};
+		void init();
 
 		std::default_random_engine seed;
 		std::uniform_int_distribution<unsigned char> randomByte;
