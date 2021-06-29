@@ -93,7 +93,7 @@ void Chip8::cycle() {
     
 
     switch (opcode & 0xF000) {
-        case 0:
+        case 0: {
             if (opcode == 0x00E0) {
                 for (int i{0}; i < 2048; ++i) {
                     display[i] = 0;
@@ -103,62 +103,63 @@ void Chip8::cycle() {
                 PC = stack[SP];
             }
             break;
-
-        case 0x1000:
+        }
+        case 0x1000: {
             PC = nnn; 
             break;
-
-        case 0x2000:
+        }
+        case 0x2000: {
             stack[SP] = PC;
             ++SP;
             PC = nnn;
             break;
-
-        case 0x3000:
+        }
+        case 0x3000: {
             if (V[x] == kk) {
                 PC += 2;
             }
             break;
-
-        case 0x4000:
+        }
+        case 0x4000: {
             if (V[x] != kk) {
                 PC += 2;
             }
             break;
-
-        case 0x5000:
+        }
+        case 0x5000: {
             if (V[x] == V[y]) {
                 PC += 2;
             }
             break;
-
-        case 0x6000:
+        }
+        case 0x6000: {
             V[x] = kk;
             break;
-
-        case 0x7000:
+        }
+        case 0x7000: {
             V[x] += kk;
             break;
-
-        case 0x8000:
+        }
+        case 0x8000: {
             switch (n) {
-                case 0x0000:
+                case 0x0000: {
                     V[x] = V[y];
                     break;
+                }
                 
-                case 0x0001:
+                case 0x0001: {
                     V[x] |= V[y];
                     break;
-                
-                case 0x0002:
+                }
+                case 0x0002: {
                     V[x] &= V[y];
                     break;
-                
-                case 0x0003:
+                }
+                case 0x0003: {
                     V[x] ^= V[y];
                     break;
-
-                case 0x0004:
+                }
+                case 0x0004: {
                     if(V[(opcode & 0x00F0) >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8])) {
                         V[0xF] = 1;
                     } else {
@@ -168,8 +169,8 @@ void Chip8::cycle() {
                     V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
                     PC += 2;
                     break;
-
-                case 0x0005:
+                }
+                case 0x0005: {
                     if (V[x] > V[y]) {
                         V[0xF] = 1;
                     } else {
@@ -178,13 +179,13 @@ void Chip8::cycle() {
 
                     V[x] -= V[y];
                     break;
-
-                case 0x0006:
+                }
+                case 0x0006: {
                     V[0xF] = V[x] & 0x1U;
 	                V[x] >>= 1;
                     break;
-
-                case 0x0007:
+                }
+                case 0x0007: {
                     if (V[y] > V[x]) {
                         V[0xF] = 1;
                     } else {
@@ -192,34 +193,35 @@ void Chip8::cycle() {
                     }
                     V[x] = V[y] - V[x];
                     break;
-
-                case 0x000E:
+                }
+                case 0x000E: {
                     V[0xF] = V[x] & 0x80U >> 7U;
 	                V[x] <<= 1;
                     break;
-                
+                }
                 default:
                     exit(-1);
             }
-        case 0x9000:
+        }
+        case 0x9000: {
             if (V[x] != V[y]) {
                 PC += 2;
             }
             break;
-        
-        case 0xA000:
+        }
+        case 0xA000: {
             I = nnn;
             break;
-        
-        case 0xB000:
+        }
+        case 0xB000: {
             PC = nnn + V[0x0];
             break;
-        
-        case 0xC000:
+        }
+        case 0xC000: {
             V[x] = randomByte(seed) & kk;
             break;
-
-        case 0xD000:
+        }
+        case 0xD000: {
             unsigned short height = n;
             unsigned short pixel{};
 
@@ -238,33 +240,33 @@ void Chip8::cycle() {
             drawFlag = true;
             PC += 2;
             break;
-        
-        case 0xE000:
+        }
+        case 0xE000: {
             switch (opcode & 0x00FF) {
-                case 0x009E:
+                case 0x009E: {
                     if (keys[V[x]]) {
                         PC += 2;
                     }
                     break;
-                
-                case 0x00A1:
+                }
+                case 0x00A1: {
                     if (!keys[V[y]]) {
                         PC += 2;
                     }
                     break;
-                
+                }
                 default:
                     exit(-1);
             }
             break;
-        
-        case 0xF000:
+        }
+        case 0xF000: 
             switch (opcode & 0x00FF) {
-                case 0x0007:
+                case 0x0007: {
                     V[x] = delayTimer;
                     break;
-
-                case 0x000A:
+                }
+                case 0x000A: {
                     bool isKeyPressed{false};
                     for (int i{0}; i < 16; ++i) {
                         if (keys[i] != 0) {
@@ -277,16 +279,16 @@ void Chip8::cycle() {
                     }
                     PC+=2;
                     break;
-
-                case 0x0015:
+                }
+                case 0x0015: {
                     delayTimer = V[x];
                     break;
-                
-                case 0x0018:
+                }
+                case 0x0018: {
                     soundTimer = V[x];
                     break;
-
-                case 0x001E:
+                }
+                case 0x001E: {
                     if (I + V[x] > 0xFFF) {
                         V[0xF] = 1;
                     } else {
@@ -294,29 +296,30 @@ void Chip8::cycle() {
                     }
                     I += V[x];
                     break;
-
-                case 0x0029:
+                }
+                case 0x0029: {
                     I = V[x] * 0x5;
                     break;
-
-                case 0x0033:
+                }
+                case 0x0033: {
                     memory[I] = V[x] / 100;
                     memory[I + 1] = (V[x] / 10) % 10;
                     memory[I + 2] = (V[x] % 100) % 10;
                     PC += 2;
                     break;
-
-                case 0x0055:
+                }
+                case 0x0055: {
                     for (int i{0}; i <= x; ++i) {
                         memory[I + i] = V[i];
                     }
                     break;
-
-                case 0x0065:
+                }
+                case 0x0065: {
                     for (int i{0}; i <= x; ++i) {
                         V[i] = memory[I + i];
                     }
                     break;
+                }
                 default:
                     exit(-1);
             }
