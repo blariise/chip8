@@ -1,6 +1,6 @@
 #pragma once
 
-struct Chip8 {
+typedef struct Chip8 {
 		uint8_t memory[4096]{};  // memory of 4kB
 		uint8_t V[16]{};     // cpu register from V0 - VF
 		uint8_t SP{}; // level of the stack (stack pointer)
@@ -17,7 +17,7 @@ struct Chip8 {
 		std::uniform_int_distribution<unsigned char> randomByte;
 		*/
 
-		void init();
+		Chip8 init(); // Initializing and reseting machine
 		void cycle(); // Fetch, Decode, Execute (One cycle)
 		void loadRom(char const *filename);
-};
+} Chip8;
