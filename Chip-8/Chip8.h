@@ -1,7 +1,6 @@
 #pragma once
 
 struct Chip8 {
-	private:
 		uint8_t memory[4096]{};  // memory of 4kB
 		uint8_t V[16]{};     // cpu register from V0 - VF
 		uint8_t SP{}; // level of the stack (stack pointer)
@@ -10,15 +9,15 @@ struct Chip8 {
 		uint16_t I{}; // pointer to location in memory (index register)
 
 		uint8_t display[64 * 32]{}; // display 64x32 px
-		uint8_t delayTimer{};
-		uint8_t soundTimer{};
+		uint8_t delay_timer{};
+		uint8_t sound_timer{};
 
 		/* 
-		void init();
 		std::default_random_engine seed;
 		std::uniform_int_distribution<unsigned char> randomByte;
 		*/
 
+		void init();
 		void cycle(); // Fetch, Decode, Execute (One cycle)
 		void loadRom(char const *filename);
 };
