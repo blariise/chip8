@@ -1,34 +1,24 @@
-#ifndef CHIP8_H
-#define CHIP8_H
+#pragma once
 
 struct Chip8 {
 	private:
-		unsigned char memory[4096]{};  // memory of 4kB
-		unsigned char V[16]{};     // cpu register from V0 - VF
-		unsigned char stack[16]{};   // current location before a next instruction
+		uint8_t memory[4096]{};  // memory of 4kB
+		uint8_t V[16]{};     // cpu register from V0 - VF
+		uint8_t SP{}; // level of the stack (stack pointer)
 
-		unsigned short PC{}; // pointer to current instruction in memory (program counter)
-		unsigned short I{}; // pointer to location in memory (index register)
-		unsigned short opcode; // current opcode
-		unsigned short SP{}; // level of the stack (stack pointer)
+		uint16_t PC{}; // pointer to current instruction in memory (program counter)
+		uint16_t I{}; // pointer to location in memory (index register)
 
-		unsigned char delayTimer{};
-		unsigned char soundTimer{};
+		uint8_t display[64 * 32]{}; // display 64x32 px
+		uint8_t delayTimer{};
+		uint8_t soundTimer{};
 
+		/* 
 		void init();
-
 		std::default_random_engine seed;
 		std::uniform_int_distribution<unsigned char> randomByte;
-
-	public:
-		unsigned char display[64 * 32]{}; // display 64x32 px
-		unsigned char keys[16]{}; // keypad
-		bool drawFlag{};
-		
-		Chip8();
-		~Chip8();
+		*/
 
 		void cycle(); // Fetch, Decode, Execute (One cycle)
 		void loadRom(char const *filename);
 };
-#endif

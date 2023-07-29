@@ -26,7 +26,7 @@ unsigned char fontSet[80]{
 // Initializing and reseting machine
 void Chip8::init() {
 
-    PC = 0x200; // 0x200 (512) Start of most Chip-8 programs
+    PC = 0x200; // 0x200 (512) Start Chip-8
     opcode = 0;
     I = 0;
     SP = 0;
