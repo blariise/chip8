@@ -84,6 +84,11 @@ void Chip8::cycle() {
         default:
           break;
       }
+
+    case 0x1:
+      PC = nnn;
+      break;
+
     defualt:
       break;
   }
