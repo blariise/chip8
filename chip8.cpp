@@ -72,12 +72,13 @@ void Chip8::cycle() {
     case 0x0:
       switch(kk) {
         
-        case 0xE0:  // CLS - clear display
+        case 0xE0:  // clear display
           for (int i { 0 }; i < 2048; ++i)
             display[i] = 0;
           break;
 
-        case 0xEE:
+        case 0xEE:  // return from function
+          PC = stack[SP];
           --PC;
           break;
         
@@ -85,8 +86,37 @@ void Chip8::cycle() {
           break;
       }
 
-    case 0x1:
+    case 0x1: // jump to 0nnn
       PC = nnn;
+      break;
+
+    case 0x2: // call function at 0nnn
+      ++SP;
+      stack[SP] = PC;
+      PC = nnn;
+      break;
+
+    case 0x3: // skip next instruction if Vx == kk
+      if (V[x] == kk)
+        PC += 2;
+      break;
+
+    case 0x4: // skip next instruction if Vx != kk
+      if (V[x] != kk)
+        PC += 2;
+      break;
+
+    case 0x5: // skip next instruction if Vx == Vy
+      if (V[x] == V[y])
+        PC += 2;
+      break;
+    
+    case 0x6: // Vx = kk
+      V[x] = kk;
+      break;
+    
+    case 0x7: // Vx += kk
+      V[x] += kk;
       break;
 
     defualt:
