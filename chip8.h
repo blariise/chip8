@@ -11,8 +11,8 @@
 typedef struct Chip8 {
   std::array<std::uint8_t, 4096> memory;  // memory of 4kB
   std::array<std::uint8_t, 16> V;     // cpu register from V0 - VF
-  std::uint8_t SP; // level of the stack (stack pointer)
   std::array<std::uint16_t, 16> stack;
+  std::uint8_t SP; // level of the stack (stack pointer)
 
   std::uint16_t PC; // pointer to current instruction in memory (program counter)
   std::uint16_t I; // pointer to location in memory (index register)
