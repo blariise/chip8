@@ -29,7 +29,7 @@ void Chip8::init() {
 
   // Clear the display
   for (int i { 0 }; i < 2048; ++i)
-    display[i] = 0;
+display[i] = 0;
 
   // Clear the stack and registers V0-VF
   for (int i { 0 }; i < 16; ++i) {
@@ -50,7 +50,6 @@ void Chip8::init() {
 }
 
 void Chip8::cycle() {
-  
   // need to shift to left 8 bits, to make room for second instruction
   // example memory[PC]     = 0xFF after shifting its 0xFF00
   //         memory[PC + 1] = 0xA1
@@ -195,6 +194,10 @@ void Chip8::cycle() {
 
     case 0xB:
       PC = nnn + V[0x0];
+      break;
+    
+    case 0xC:
+      V[x] = random_byte(mt) & kk;
       break;
 
     defualt:

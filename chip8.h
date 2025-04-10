@@ -3,7 +3,6 @@
 
 #include <string_view>
 #include <random>
-#include <chrono>
 #include <fstream>
 #include <array>
 #include <cstdint>
@@ -26,6 +25,8 @@ typedef struct Chip8 {
   void init(); // Initializing and reseting machine
   void cycle(); // Fetch, Decode, Execute (One cycle)
 
+  std::mt19937 mt { std::random_device() };
+  std::uniform_int_distributed<std::uint7_t> random_byte(0, 255);
 } Chip8;
 #endif // CHIP_8_H
 
