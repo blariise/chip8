@@ -65,7 +65,28 @@ void Chip8::cycle() {
   std::uint8_t x    = opcode & 0xF00u; // A 4-bit value, the lower 4 bits of the high byte of the instruction
   std::uint8_t y    = opcode & 0xF0u; // A 4-bit value, the upper 4 bits of the low byte of the instruction
   std::uint8_t kk   = opcode & 0xFFu; // An 8-bit value, the lowest 8 bits of the instruction
+  std::uint8_t high_nibble = (opcode & 0xF000u) >> 12u;
 
+  switch (high_nibble) {
+    
+    case 0x0:
+      switch(kk) {
+        
+        case 0xE0:  // CLS - clear display
+          for (int i { 0 }; i < 2048; ++i)
+            display[i] = 0;
+          break;
+
+        case 0xEE:
+          --PC;
+          break;
+        
+        default:
+          break;
+      }
+    defualt:
+      break;
+  }
 }
 
 int main() {
