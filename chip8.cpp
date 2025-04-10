@@ -170,6 +170,7 @@ void Chip8::cycle() {
           else
             V[0xF] = 0;
           V[x] = V[y] - V[x];
+          break;
 
         case 0xE:
           if (V[x] & 0x80 == 0x80)
@@ -182,6 +183,19 @@ void Chip8::cycle() {
         default:
           break;
       }
+
+    case 0x9:
+      if (V[x] != V[y])
+        PC += 2;
+      break;
+
+    case 0xA:
+      I = nnn;
+      break;
+
+    case 0xB:
+      PC = nnn + V[0x0];
+      break;
 
     defualt:
       break;
