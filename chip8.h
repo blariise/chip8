@@ -23,14 +23,8 @@ typedef struct Chip8 {
   std::uint8_t delay_timer;
   std::uint8_t sound_timer;
 
-  /* 
-    std::default_random_engine seed;
-    std::uniform_int_distribution<unsigned char> random_byte;
-  */
-
   void init(); // Initializing and reseting machine
   void cycle(); // Fetch, Decode, Execute (One cycle)
-  void loadRom(std::string_view filename);
 
 } Chip8;
 #endif // CHIP_8_H
