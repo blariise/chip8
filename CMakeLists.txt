@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(chip8)
 
+set(CMAKE_CXX_STANDARD 20)
+
 find_package(SDL3 REQUIRED)
 add_executable(chip8 chip8.cpp)
 
