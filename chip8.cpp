@@ -111,13 +111,77 @@ void Chip8::cycle() {
         PC += 2;
       break;
     
-    case 0x6: // Vx = kk
+    case 0x6:
       V[x] = kk;
       break;
     
-    case 0x7: // Vx += kk
+    case 0x7:
       V[x] += kk;
       break;
+
+    case 0x8:
+      switch(n) {
+
+        case 0x0:
+          V[x] = V[y];
+          break;
+
+        case 0x1:
+          V[x] = V[x] | V[y];
+          break;
+
+        case 0x2:
+          V[x] = V[x] & V[y];
+          break;
+
+        case 0x3:
+          V[x] = V[x] ^ V[y];
+          break;
+
+        case 0x4: {
+          std::uint16_t sum = V[x] + V[y];
+          V[x] = sum & 0xFFu;
+          if (sum > 0xFFu)
+            V[0xF] = 0xF;
+          else
+            V[0xF] = 0x0;
+          break;
+        }
+        
+        case 0x5:
+          if (V[x] > V[y])
+            V[0xF] = 1;
+          else
+            V[0xF] = 0;
+          V[x] -= V[y];
+          break;
+
+        case 0x6:
+          if (V[x] & 0x1 == 0x1)
+            V[0xF] = 1;
+          else
+            V[0xF] = 0;
+          V[x] /= 0x2;
+          break;
+
+        case 0x7:
+          if (V[y] > V[x])
+            V[0xF] = 1;
+          else
+            V[0xF] = 0;
+          V[x] = V[y] - V[x];
+
+        case 0xE:
+          if (V[x] & 0x80 == 0x80)
+            V[0xF] = 1;
+          else
+            V[0xF] = 0;
+          V[x] *= 0x2;
+          break;
+
+        default:
+          break;
+      }
 
     defualt:
       break;
