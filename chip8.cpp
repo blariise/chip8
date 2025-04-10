@@ -54,35 +54,20 @@ void Chip8::init() {
 }
 
 //void Chip8::loadRom(std::string_view filename) {
-//
-//  std::ifstream file(filename, std::ios::binary | std::ios::ate);
-//
-//  if (file.is_open()) {
-//    std::streampos size { file.tellg() };
-//    char* buffer { new char[size] };
-//    file.seekg(0, std::ios::beg);
-//    file.read(buffer, size);
-//    file.close();
-//
-//    for (int i { 0 }; i < size; ++i)
-//      memory[0x200 + i] = buffer[i];
-//    
-//    delete[] buffer;
-//  }
 //}
 
-//void Chip8::cycle() {
-//
-//  //Fetch opcode
-//  opcode = memory[PC] << 8 | memory[PC + 1]; 
-//
-//  PC += 2;
-//
-//  unsigned char nnn { opcode & 0x0FFFU }; // A 12-bit value, the lowest 12 bits of the instruction
-//  unsigned char n { opcode & 0x000F }; // A 4-bit value, the lowest 4 bits of the instruction
-//  unsigned char x { (opcode & 0x0F00U) >> 8U }; // A 4-bit value, the lower 4 bits of the high byte of the instruction
-//  unsigned char y { (opcode & 0x00F0U) >> 4U }; // A 4-bit value, the upper 4 bits of the low byte of the instruction
-//  unsigned char kk { opcode & 0x00FFU }; // An 8-bit value, the lowest 8 bits of the instruction
+void Chip8::cycle() {
+
+  //Fetch opcode
+  //opcode = memory[PC] << 8 | memory[PC + 1]; 
+
+  //PC += 2;
+
+  std::uint16_t nnn { opcode & 0xFFFu }; // A 12-bit value, the lowest 12 bits of the instruction
+  std::uint8_t n    { opcode & 0xFu }; // A 4-bit value, the lowest 4 bits of the instruction
+  std::uint8_t x    { opcode & 0xF00u }; // A 4-bit value, the lower 4 bits of the high byte of the instruction
+  std::uint8_t y    { opcode & 0xF0u }; // A 4-bit value, the upper 4 bits of the low byte of the instruction
+  std::uint8_t kk   { opcode & 0xFFu }; // An 8-bit value, the lowest 8 bits of the instruction
 //    
 //
 //  switch (opcode & 0xF000) {
