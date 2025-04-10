@@ -55,7 +55,8 @@ void Chip8::cycle() {
   // example memory[PC]     = 0xFF after shifting its 0xFF00
   //         memory[PC + 1] = 0xA1
   //         so 0xFF00 | 0xFFA1
-  opcode = (memory[PC] << 8) | (memory[PC + 1];
+  // fetch opcode
+  opcode = (memory[PC] << 8) | (memory[PC + 1]);
 
   PC += 2;  // increment by 2, because every instruction(opcode) is 2bytes
 
@@ -64,6 +65,7 @@ void Chip8::cycle() {
   std::uint8_t x    = opcode & 0xF00u; // A 4-bit value, the lower 4 bits of the high byte of the instruction
   std::uint8_t y    = opcode & 0xF0u; // A 4-bit value, the upper 4 bits of the low byte of the instruction
   std::uint8_t kk   = opcode & 0xFFu; // An 8-bit value, the lowest 8 bits of the instruction
+
 }
 
 int main() {
