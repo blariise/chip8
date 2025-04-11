@@ -303,6 +303,3 @@ void Chip8::cycle() {
   }
 }
 
-int main() {
-  return 0;
-}
