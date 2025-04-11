@@ -1,6 +1,6 @@
 #include "chip8.h"
 
-std::array<std::uint8_t, 80> fontSet {
+std::array<std::uint8_t, 80> font_map {
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
   0x20, 0x60, 0x20, 0x20, 0x70, // 1
   0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -19,34 +19,30 @@ std::array<std::uint8_t, 80> fontSet {
   0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 };
 
+std::array<std::uint8_t, 16> key_map {
+  0x0, // 0
+  0x1, // 1
+  0x2, // 2
+  0x3, // 3
+  0x4, // 4
+  0x5, // 5
+  0x6, // 6
+  0x7, // 7
+  0x8, // 8
+  0x9, // 9
+  0xA, // A
+  0xB, // B
+  0xC, // C
+  0xD, // D
+  0xE, // E
+  0xF,  // F
+};
+
 // Initializing and reseting machine
-void Chip8::init() {
-
-  PC = 0x200; // 0x200 (512) Start Chip-8
-  opcode = 0;
-  I = 0;
-  SP = 0;
-
-  // Clear the display
-  for (int i { 0 }; i < 2048; ++i)
-display[i] = 0;
-
-  // Clear the stack and registers V0-VF
-  for (int i { 0 }; i < 16; ++i) {
-    stack[i] = 0;
-    V[i] = 0;
-  }
-    
-  // Clear memory
-  for (int i { 0 }; i < 4096; ++i)
-    memory[i] = 0;
-
+void Chip8::loadFont() {
   // Load fonts into memory
   for (int i { 0 }; i < 80; ++i)
-    memory[i] = fontSet[i];
-
-  delay_timer = 0;
-  sound_timer = 0;
+    memory[i] = font_map[i];
 }
 
 void Chip8::cycle() {
@@ -78,7 +74,7 @@ void Chip8::cycle() {
 
         case 0xEE:  // return from function
           PC = stack[SP];
-          --PC;
+          --SP;
           break;
         
         default:
@@ -199,6 +195,45 @@ void Chip8::cycle() {
     case 0xC:
       V[x] = random_byte(mt) & kk;
       break;
+
+    case 0xD: {
+      V[0xF] = 0;
+      // postion[ y * 64 + x ]
+      // ...
+      // postion[ (y + n-1) * 64 + x]
+      for (std::uint8_t row { 0 }; row < n; ++row) {
+        std::uint8_t sprite { memory[I + row] };
+        std::uint8_t pixel_y = (y + row) % 32;  // height of display is 32 so if y exceedes it wraps around
+        
+        for (std::uint8_t col { 0 }; col < 8; ++col) { // col < BYTE
+          std::uint8_t pixel_x = (x + col) % 64; // width of display is 64 so if x exceedes it wraps around 
+          bool pixel_sprite = (sprite >> (7 - col)) & 0x1u;
+         
+          std::uint8_t index { pixel_sprite && display[pixel_y * 64 + pixel_x] };
+          if (pixel_sprite && display[index])
+            V[0xFu] = 1;
+
+          display[index] ^= pixel_sprite;
+        }
+      }
+      break;
+    }
+
+    case 0xE:
+      switch(kk) {
+
+        case 0x9E:
+          //// to do!!!!!!!!!!
+         // if (keyboard[V[x]])
+         //   PC += 2;
+          break;
+
+        case 0xA1:
+          break;
+
+        default:
+          break;
+      }
 
     defualt:
       break;
