@@ -65,7 +65,7 @@ void Chip8::cycle() {
   switch (high_nibble) {
     
     case 0x0:
-      switch(kk) {
+      switch (kk) {
         
         case 0xE0:  // clear display
           for (int i { 0 }; i < 2048; ++i)
@@ -115,7 +115,7 @@ void Chip8::cycle() {
       break;
 
     case 0x8:
-      switch(n) {
+      switch (n) {
 
         case 0x0:
           V[x] = V[y];
@@ -220,22 +220,85 @@ void Chip8::cycle() {
     }
 
     case 0xE:
-      switch(kk) {
+      switch (kk) {
 
         case 0x9E:
-          //// to do!!!!!!!!!!
-         // if (keyboard[V[x]])
-         //   PC += 2;
+          if (keyboard[V[x]])
+            PC += 2;
           break;
 
         case 0xA1:
+          if (!keyboard[V[x]])
+            PC += 2;
           break;
 
         default:
           break;
       }
 
-    defualt:
+    case 0xF:
+      switch (kk) {
+      
+        case 0x07:
+          V[x] = delay_timer;
+          break;
+
+        case 0x0A: {
+          bool exit = false;
+          while(!exit) {
+            for (std::uint8_t i { 0 }; i < 16; ++i) {
+              if (keyboard[i]) {
+                V[x] = key_map[i];
+                exit = true;
+              }
+            }
+          }
+          break;
+        }
+
+        case 0x15:
+          delay_timer = V[x];
+          break;
+
+        case 0x18:
+          sound_timer = V[x];
+          break;
+
+        case 0x1E:
+          I += V[x];
+          break;
+
+        case 0x29:
+          I = V[x] * 0x05u;
+          break;
+
+        case 0x33: {
+          std::uint8_t digit = V[x];
+          
+          memory[I + 2] = digit % 10;
+          digit /= 10;
+          memory[I + 1] = digit % 10;
+          digit /= 10;
+          memory[I] = digit % 10;
+          
+          break;
+        }
+
+        case 0x55:
+          for (std::uint8_t i { 0 }; i < 16; ++i)
+            memory[I + i] = V[i];
+          break;
+
+        case 0x65:
+          for (std::uint8_t i { 0 }; i < 16; ++i)
+            V[i] = memory[I + i];
+          break;
+        
+        default:
+          break;
+      }
+
+    default:
       break;
   }
 }
