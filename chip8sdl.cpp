@@ -3,8 +3,7 @@
 
 Chip8sdl::Chip8sdl()
   : window { nullptr }
-  , renderer { nullptr }
-  , texture { nullptr } {}
+  , renderer { nullptr } {}
 
 Chip8sdl::~Chip8sdl() {}
 
@@ -17,7 +16,7 @@ bool Chip8sdl::init() {
       "chip8",
       640,
       320,
-      SDL_WINDOW_OPENGL);
+      SDL_WINDOW_RESIZABLE);
   if (!window)
     return false;
 
@@ -32,6 +31,7 @@ void Chip8sdl::run(Chip8& chip8) {
   while (true) {
     handleInput(chip8);
     chip8.cycle();
+    debugDisplay(chip8);
     updateDisplay(chip8);
     SDL_Delay(2);
   }
@@ -72,9 +72,11 @@ void Chip8sdl::updateDisplay(const Chip8& chip8) {
   for (int y { 0 }; y < 32; ++y) {
     for (int x { 0 }; x < 64; ++x) {
       if (display[y * 64 + x]) {
-        SDL_FRect pixel {
+        SDL_FRect pixel { 
           static_cast<float>(x * scale),
-          static_cast<float>(y * scale, scale) };
+          static_cast<float>(y * scale),
+          static_cast<float>(scale),
+          static_cast<float>(scale)};
         SDL_RenderFillRect(renderer, &pixel);
       }
     }
@@ -82,3 +84,12 @@ void Chip8sdl::updateDisplay(const Chip8& chip8) {
   SDL_RenderPresent(renderer);
 }
 
+void Chip8sdl::debugDisplay(const Chip8& chip8) {
+  auto& display = chip8.getDisplay();
+  for (int y = 0; y < 32; y++) {
+    for (int x = 0; x < 64; x++) {
+      std::cout << (display[y * 64 + x] ? "█" : " ");
+    }
+    std::cout << "\n";
+  }
+}

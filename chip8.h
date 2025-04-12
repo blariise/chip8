@@ -10,10 +10,11 @@
 class Chip8 {
   public:
     Chip8();
+    ~Chip8();
     void cycle(); // one cycle of chip8
     const std::array<bool, 64 * 32>& getDisplay() const;
     void setKeyState(std::size_t key, bool pressed);
-    void loadRom(std::string_view filename);
+    int loadRom(const char* filename);
 
   private:
     std::array<std::uint8_t, 4096> memory {};  // memory of 4kB

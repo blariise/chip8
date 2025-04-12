@@ -1,5 +1,8 @@
 #include <iostream>
 #include "chip8.h"
+#include <fstream>
+
+int ITER { 0 };
 
 std::array<std::uint8_t, 80> font_map {
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -39,14 +42,52 @@ std::array<std::uint8_t, 16> key_map {
   0xF,  // F
 };
 
-Chip8::Chip8() {}
+Chip8::Chip8() {
+  loadFont();
+}
 
-void Chip8::loadRom(std::string_view filename) {
-  std::ifstream file(filename.data(), std::ios::binary | std::ios::ate);
-  if (!file.is_open())
-    std::cerr << "Failed to open rom " << filename << '\n';
+std::ofstream myfile("test.txt");
 
-  file.read(reinterpret_cast<char*>(&memory[0x200]), file.tellg());
+Chip8::~Chip8() {
+  myfile.close();
+}
+//void Chip8::loadRom(std::string_view filename) {
+//  std::ifstream file(filename.data(), std::ios::binary);
+//
+//	if (file.is_open()) {
+//		std::streampos size = file.tellg();
+//		char* buffer = new char[size];
+//
+//		file.seekg(0, std::ios::beg);
+//		file.read(buffer, size);
+//		file.close();
+//
+//		for (long i = 0; i < size; ++i) {
+//			memory[0x200 + i] = buffer[i];
+//		}
+//
+//		delete[] buffer;
+//	}
+//}
+
+int Chip8::loadRom(const char* filename) {
+    FILE* file = fopen(filename, "rb");
+    if (!file) {
+        perror("Failed to open ROM");
+        return -1;
+    }
+
+    // Get file size
+    fseek(file, 0, SEEK_END);
+    long rom_size = ftell(file);
+    rewind(file);
+
+
+    // Read ROM into memory starting at 0x200
+    fread(&memory[0x200], sizeof(unsigned char), rom_size, file);
+    fclose(file);
+
+    return 0;
 }
 
 const std::array<bool, 64 * 32>& Chip8::getDisplay() const {
@@ -77,11 +118,24 @@ void Chip8::cycle() {
 
   std::uint16_t nnn = opcode & 0xFFFu; // A 12-bit value, the lowest 12 bits of the instruction
   std::uint8_t n    = opcode & 0xFu; // A 4-bit value, the lowest 4 bits of the instruction
-  std::uint8_t x    = opcode & 0xF00u; // A 4-bit value, the lower 4 bits of the high byte of the instruction
-  std::uint8_t y    = opcode & 0xF0u; // A 4-bit value, the upper 4 bits of the low byte of the instruction
+  std::uint8_t x    = (opcode & 0xF00u) >> 8u; // A 4-bit value, the lower 4 bits of the high byte of the instruction
+  std::uint8_t y    = (opcode & 0xF0u) >> 4u; // A 4-bit value, the upper 4 bits of the low byte of the instruction
   std::uint8_t kk   = opcode & 0xFFu; // An 8-bit value, the lowest 8 bits of the instruction
   std::uint8_t high_nibble = (opcode & 0xF000u) >> 12u;
 
+ // std::cout << "n:  0x___n: " << std::hex << (int)n << '\n';
+ // std::cout << "x:  0x_x__: " << std::hex << (int)x << '\n';
+ // std::cout << "y:  0x__y_: " << std::hex << (int)y << '\n';
+ // std::cout << "kk: 0x__kk: " << std::hex << (int)kk << '\n';
+ // std::cout << "C:  0xC___: " << std::hex << (int)high_nibble << '\n';
+  if (myfile.is_open()) {
+    ++ITER;
+    myfile << "# " << ITER << '\n';
+    myfile << "opcode: " << std::hex << (int)opcode << '\n';
+    for (auto i { 0 }; i < std::size(V); ++i) {
+      myfile << "V[" << std::hex << i << "] = " << std::dec << (int)V[i] << '\n';
+    }
+  }
   switch (high_nibble) {
     
     case 0x0:
@@ -100,6 +154,7 @@ void Chip8::cycle() {
         default:
           break;
       }
+      break;
 
     case 0x1: // jump to 0nnn
       PC = nnn;
@@ -172,7 +227,7 @@ void Chip8::cycle() {
           break;
 
         case 0x6:
-          if (V[x] & 0x1 == 0x1)
+          if ((V[x] & 0x1) == 0x1)
             V[0xF] = 1;
           else
             V[0xF] = 0;
@@ -188,7 +243,7 @@ void Chip8::cycle() {
           break;
 
         case 0xE:
-          if (V[x] & 0x80 == 0x80)
+          if ((V[x] & 0x80) == 0x80)
             V[0xF] = 1;
           else
             V[0xF] = 0;
@@ -198,6 +253,7 @@ void Chip8::cycle() {
         default:
           break;
       }
+      break;
 
     case 0x9:
       if (V[x] != V[y])
@@ -218,23 +274,22 @@ void Chip8::cycle() {
 
     case 0xD: {
       V[0xF] = 0;
-      std::uint8_t byte { 8 };
-      // postion[ y * 64 + x ]
-      // ...
-      // postion[ (y + n-1) * 64 + x]
+      uint8_t cord_x { static_cast<uint8_t>(V[x] % 64) };
+      uint8_t cord_y { static_cast<uint8_t>(V[y] % 32) };
+      
       for (std::uint8_t row { 0 }; row < n; ++row) {
-        std::uint8_t sprite { memory[I + row] };
-        std::uint8_t pixel_y = (y + row) % 32;  // height of display is 32 so if y exceedes it wraps around
-        
-        for (std::uint8_t col { 0 }; col < byte; ++col) {
-          std::uint8_t pixel_x = (x + col) % 64; // width of display is 64 so if x exceedes it wraps around 
-          bool pixel_sprite = (sprite >> (7 - col)) & 0x1u;
-         
-          std::uint8_t index { pixel_sprite && display[pixel_y * 64 + pixel_x] };
-          if (pixel_sprite && display[index])
-            V[0xFu] = 1;
+        uint8_t sprite { memory[I + row] };
 
-          display[index] ^= pixel_sprite;
+        for (std::uint8_t col { 0 }; col < 8; ++col) {
+          if (sprite & (0x80 >> col)) {
+            std::uint8_t pixel_x = (cord_x + col) % 64;
+            std::uint8_t pixel_y = (cord_y + row) % 32;
+            std::uint16_t pixel_index = pixel_y * 64 + pixel_x;
+
+            if (display[pixel_index])
+              V[0xF] = 1;
+            display[pixel_index] ^= 1;
+          }
         }
       }
       break;
@@ -256,6 +311,7 @@ void Chip8::cycle() {
         default:
           break;
       }
+      break;
 
     case 0xF:
       switch (kk) {
@@ -318,6 +374,7 @@ void Chip8::cycle() {
         default:
           break;
       }
+      break;
 
     default:
       break;

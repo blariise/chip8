@@ -17,11 +17,11 @@ class Chip8sdl {
     void run(Chip8& chip8);
     void updateDisplay(const Chip8& chip8);
     void handleInput(Chip8& chip8);
+    void debugDisplay(const Chip8& chip8);
 
   private:
     SDL_Window* window;
     SDL_Renderer* renderer;
-    SDL_Texture* texture;
 
     std::array<SDL_Keycode, 16> keymap {
       SDLK_1, SDLK_2, SDLK_3, SDLK_4,
