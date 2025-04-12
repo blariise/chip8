@@ -38,6 +38,8 @@ std::array<std::uint8_t, 16> key_map {
   0xF,  // F
 };
 
+Chip8::Chip8() {}
+
 // Initializing and reseting machine
 void Chip8::loadFont() {
   // Load fonts into memory
@@ -198,6 +200,7 @@ void Chip8::cycle() {
 
     case 0xD: {
       V[0xF] = 0;
+      std::uint8_t byte { 8 };
       // postion[ y * 64 + x ]
       // ...
       // postion[ (y + n-1) * 64 + x]
@@ -205,7 +208,7 @@ void Chip8::cycle() {
         std::uint8_t sprite { memory[I + row] };
         std::uint8_t pixel_y = (y + row) % 32;  // height of display is 32 so if y exceedes it wraps around
         
-        for (std::uint8_t col { 0 }; col < 8; ++col) { // col < BYTE
+        for (std::uint8_t col { 0 }; col < byte; ++col) {
           std::uint8_t pixel_x = (x + col) % 64; // width of display is 64 so if x exceedes it wraps around 
           bool pixel_sprite = (sprite >> (7 - col)) & 0x1u;
          
