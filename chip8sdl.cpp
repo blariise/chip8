@@ -32,7 +32,7 @@ void Chip8sdl::run(Chip8& chip8) {
   while (true) {
     handleInput(chip8);
     chip8.cycle();
-    // updateDisplay(chip8);
+    updateDisplay(chip8);
     SDL_Delay(2);
   }
 }
@@ -61,6 +61,26 @@ void Chip8sdl::handleInput(Chip8& chip8) {
   }
 }
 
+void Chip8sdl::updateDisplay(const Chip8& chip8) {
+  auto& display { chip8.getDisplay() };
+  constexpr int scale { 10 };
+
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // clear display
+  SDL_RenderClear(renderer);
+  
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  for (int y { 0 }; y < 32; ++y) {
+    for (int x { 0 }; x < 64; ++x) {
+      if (display[y * 64 + x]) {
+        SDL_FRect pixel {
+          static_cast<float>(x * scale),
+          static_cast<float>(y * scale, scale) };
+        SDL_RenderFillRect(renderer, &pixel);
+      }
+    }
+  }
+  SDL_RenderPresent(renderer);
+}
 
 int main() {
   return 0;

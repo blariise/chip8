@@ -40,6 +40,10 @@ std::array<std::uint8_t, 16> key_map {
 
 Chip8::Chip8() {}
 
+const std::array<bool, 64 * 32>& Chip8::getDisplay() const {
+  return display;
+}
+
 void Chip8::setKeyState(std::size_t key, bool pressed) {
   if (key < std::size(keyboard))
     keyboard[key] = pressed;
