@@ -3,30 +3,31 @@
 
 #include <iostream>
 #include <memory>
-#include <chip8.h>
+#include "chip8.h"
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_keycode.h>
 
 class Chip8sdl {
   public:
     Chip8sdl();
     ~Chip8sdl();
 
-    void init();
+    bool init();
     void run(Chip8& chip8);
     void updateDisplay(const Chip8& chip8);
     void handleInput(Chip8& chip8);
 
   private:
-    std::unique_ptr<SDL_Window> window;
-    std::unique_ptr<SDL_Renderer> renderer;
-    std::unique_ptr<SDL_Texture> texture;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    SDL_Texture* texture;
 
     std::array<SDL_Keycode, 16> keymap {
       SDLK_1, SDLK_2, SDLK_3, SDLK_4,
-      SDLK_q, SDLK_w, SDLK_e, SDLK_r,
-      SDLK_a, SDLK_s, SDLK_d, SDLK_f,
-      SDLK_z, SDLK_x, SDLK_c, SDLK_v,
+      SDLK_Q, SDLK_W, SDLK_E, SDLK_R,
+      SDLK_A, SDLK_S, SDLK_D, SDLK_F,
+      SDLK_Z, SDLK_X, SDLK_C, SDLK_V,
     };
 };
 #endif // CHIP8SDL_H
