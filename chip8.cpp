@@ -1,3 +1,4 @@
+#include <iostream>
 #include "chip8.h"
 
 std::array<std::uint8_t, 80> font_map {
@@ -39,6 +40,14 @@ std::array<std::uint8_t, 16> key_map {
 };
 
 Chip8::Chip8() {}
+
+void Chip8::loadRom(std::string_view filename) {
+  std::ifstream file(filename.data(), std::ios::binary | std::ios::ate);
+  if (!file.is_open())
+    std::cerr << "Failed to open rom " << filename << '\n';
+
+  file.read(reinterpret_cast<char*>(&memory[0x200]), file.tellg());
+}
 
 const std::array<bool, 64 * 32>& Chip8::getDisplay() const {
   return display;

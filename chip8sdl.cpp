@@ -82,6 +82,3 @@ void Chip8sdl::updateDisplay(const Chip8& chip8) {
   SDL_RenderPresent(renderer);
 }
 
-int main() {
-  return 0;
-}
