@@ -40,6 +40,11 @@ std::array<std::uint8_t, 16> key_map {
 
 Chip8::Chip8() {}
 
+void Chip8::setKeyState(std::size_t key, bool pressed) {
+  if (key < std::size(keyboard))
+    keyboard[key] = pressed;
+}
+
 // Initializing and reseting machine
 void Chip8::loadFont() {
   // Load fonts into memory
