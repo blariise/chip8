@@ -2,4 +2,9 @@
 
 cmake --build build
 cd build && ctest
-cd ../ && ./build/chip8 $1
+if [ $# -eq 0 ]
+then
+  echo "no rom provided"
+else
+  cd ../ && ./build/chip8 $1
+fi
