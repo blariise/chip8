@@ -5,7 +5,11 @@ Chip8sdl::Chip8sdl()
   : window { nullptr }
   , renderer { nullptr } {}
 
-Chip8sdl::~Chip8sdl() {}
+Chip8sdl::~Chip8sdl() {
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+}
 
 bool Chip8sdl::init() {
 
@@ -31,7 +35,6 @@ void Chip8sdl::run(Chip8& chip8) {
   while (true) {
     handleInput(chip8);
     chip8.cycle();
-    debugDisplay(chip8);
     updateDisplay(chip8);
     SDL_Delay(2);
   }

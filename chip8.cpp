@@ -2,8 +2,6 @@
 #include "chip8.h"
 #include <fstream>
 
-int ITER { 0 };
-
 std::array<std::uint8_t, 80> font_map {
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
   0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -46,30 +44,9 @@ Chip8::Chip8() {
   loadFont();
 }
 
-std::ofstream myfile("test.txt");
+Chip8::~Chip8() {}
 
-Chip8::~Chip8() {
-  myfile.close();
-}
-//void Chip8::loadRom(std::string_view filename) {
-//  std::ifstream file(filename.data(), std::ios::binary);
-//
-//	if (file.is_open()) {
-//		std::streampos size = file.tellg();
-//		char* buffer = new char[size];
-//
-//		file.seekg(0, std::ios::beg);
-//		file.read(buffer, size);
-//		file.close();
-//
-//		for (long i = 0; i < size; ++i) {
-//			memory[0x200 + i] = buffer[i];
-//		}
-//
-//		delete[] buffer;
-//	}
-//}
-
+// copied from stackoveflow
 int Chip8::loadRom(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
@@ -101,7 +78,6 @@ void Chip8::setKeyState(std::size_t key, bool pressed) {
 
 // Initializing and reseting machine
 void Chip8::loadFont() {
-  // Load fonts into memory
   for (int i { 0 }; i < 80; ++i)
     memory[i] = font_map[i];
 }
@@ -123,19 +99,6 @@ void Chip8::cycle() {
   std::uint8_t kk   = opcode & 0xFFu; // An 8-bit value, the lowest 8 bits of the instruction
   std::uint8_t high_nibble = (opcode & 0xF000u) >> 12u;
 
- // std::cout << "n:  0x___n: " << std::hex << (int)n << '\n';
- // std::cout << "x:  0x_x__: " << std::hex << (int)x << '\n';
- // std::cout << "y:  0x__y_: " << std::hex << (int)y << '\n';
- // std::cout << "kk: 0x__kk: " << std::hex << (int)kk << '\n';
- // std::cout << "C:  0xC___: " << std::hex << (int)high_nibble << '\n';
-  if (myfile.is_open()) {
-    ++ITER;
-    myfile << "# " << ITER << '\n';
-    myfile << "opcode: " << std::hex << (int)opcode << '\n';
-    for (auto i { 0 }; i < std::size(V); ++i) {
-      myfile << "V[" << std::hex << i << "] = " << std::dec << (int)V[i] << '\n';
-    }
-  }
   switch (high_nibble) {
     
     case 0x0:
@@ -212,9 +175,9 @@ void Chip8::cycle() {
           std::uint16_t sum = V[x] + V[y];
           V[x] = sum & 0xFFu;
           if (sum > 0xFFu)
-            V[0xF] = 0xF;
+            V[0xF] = 1;
           else
-            V[0xF] = 0x0;
+            V[0xF] = 0;
           break;
         }
         
@@ -351,7 +314,6 @@ void Chip8::cycle() {
 
         case 0x33: {
           std::uint8_t digit = V[x];
-          
           memory[I + 2] = digit % 10;
           digit /= 10;
           memory[I + 1] = digit % 10;
