@@ -16,7 +16,6 @@ class Chip8 {
     void setKeyState(std::size_t key, bool pressed);
     int loadRom(const char* filename);
 
-  private:
     void execute(std::uint16_t opcode);
 
     std::array<std::uint8_t, 4096> memory {};  // memory of 4kB
