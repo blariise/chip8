@@ -91,7 +91,10 @@ void Chip8::cycle() {
   opcode = (memory[PC] << 8) | (memory[PC + 1]);
 
   PC += 2;  // increment by 2, because every instruction(opcode) is 2bytes
+  execute(opcode);
+}
 
+void Chip8::execute(std::uint16_t opcode) {
   std::uint16_t nnn = opcode & 0xFFFu; // A 12-bit value, the lowest 12 bits of the instruction
   std::uint8_t n    = opcode & 0xFu; // A 4-bit value, the lowest 4 bits of the instruction
   std::uint8_t x    = (opcode & 0xF00u) >> 8u; // A 4-bit value, the lower 4 bits of the high byte of the instruction
