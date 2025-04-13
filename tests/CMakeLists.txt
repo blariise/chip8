@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(
   chip8_tests
   chip8_tests.cpp
-  ../chip8.cpp
+  ../src/chip8.cpp
 )
 
 target_link_libraries(

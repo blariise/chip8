@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <cstdint>
 
-#include "../chip8.h"
+#include "chip8.h"
 
 class Chip8test : public testing::Test {
   protected:
