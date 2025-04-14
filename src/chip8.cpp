@@ -22,22 +22,22 @@ std::array<std::uint8_t, 80> font_map {
 };
 
 std::array<std::uint8_t, 16> key_map {
-  0x0, // 0
-  0x1, // 1
-  0x2, // 2
-  0x3, // 3
-  0x4, // 4
-  0x5, // 5
-  0x6, // 6
-  0x7, // 7
-  0x8, // 8
-  0x9, // 9
-  0xA, // A
-  0xB, // B
-  0xC, // C
-  0xD, // D
-  0xE, // E
-  0xF,  // F
+  0x1,
+  0x2,
+  0x3,
+  0xC,
+  0x4,
+  0x5,
+  0x6,    // 1 2 3 C
+  0xD,    // 4 5 6 D
+  0x7,    // 7 8 9 E
+  0x8,    // A 0 B F
+  0x9,
+  0xE,
+  0xA,
+  0x0,
+  0xB,
+  0xF,
 };
 
 Chip8::Chip8() {
@@ -92,6 +92,9 @@ void Chip8::cycle() {
 
   PC += 2;  // increment by 2, because every instruction(opcode) is 2bytes
   execute(opcode);
+ // std::cout << "opcode: " << std::hex << "0x" << opcode << "\n";
+ // for (int i {0}; i < std::size(V); ++i)
+ //   std::cout << "V" << std::hex << i << std::dec << ": " << (int)V[i] << '\n';
 }
 
 void Chip8::execute(std::uint16_t opcode) {
@@ -327,12 +330,12 @@ void Chip8::execute(std::uint16_t opcode) {
         }
 
         case 0x55:
-          for (std::uint8_t i { 0 }; i < 16; ++i)
+          for (int i { 0 }; i <= x; ++i)
             memory[I + i] = V[i];
           break;
 
         case 0x65:
-          for (std::uint8_t i { 0 }; i < 16; ++i)
+          for (int i { 0 }; i <= x; ++i)
             V[i] = memory[I + i];
           break;
         

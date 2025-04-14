@@ -23,11 +23,16 @@ class Chip8sdl {
     SDL_Window* window;
     SDL_Renderer* renderer;
 
+    // idk how i mapped this
+    // 1 2 3 C
+    // 4 5 6 D
+    // 7 8 9 E
+    // A 0 B F
     std::array<SDL_Keycode, 16> keymap {
-      SDLK_1, SDLK_2, SDLK_3, SDLK_4,
-      SDLK_Q, SDLK_W, SDLK_E, SDLK_R,
-      SDLK_A, SDLK_S, SDLK_D, SDLK_F,
-      SDLK_Z, SDLK_X, SDLK_C, SDLK_V,
+      SDLK_X, SDLK_1, SDLK_2, SDLK_3,
+      SDLK_Q, SDLK_W, SDLK_E, SDLK_A,
+      SDLK_S, SDLK_D, SDLK_Z, SDLK_C,
+      SDLK_4, SDLK_R, SDLK_F, SDLK_V,
     };
 };
 #endif // CHIP8SDL_H
