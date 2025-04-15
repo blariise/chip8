@@ -18,6 +18,8 @@ class Chip8 {
 
     void execute(std::uint16_t opcode);
 
+    void updateTimers();
+
     std::array<std::uint8_t, 4096> memory {};  // memory of 4kB
     std::array<std::uint8_t, 16> V {};     // cpu register from V0 - VF
     std::array<std::uint16_t, 16> stack {};

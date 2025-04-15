@@ -70,6 +70,13 @@ void Chip8::cycle() {
  //   std::cout << "V" << std::hex << i << std::dec << ": " << (int)V[i] << '\n';
 }
 
+void Chip8::updateTimers() {
+  if (delay_timer > 0)
+    --delay_timer;
+  if (sound_timer > 0)
+    --sound_timer;
+}
+
 void Chip8::execute(std::uint16_t opcode) {
   std::uint16_t nnn = opcode & 0xFFFu; // A 12-bit value, the lowest 12 bits of the instruction
   std::uint8_t n    = opcode & 0xFu; // A 4-bit value, the lowest 4 bits of the instruction

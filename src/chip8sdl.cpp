@@ -32,10 +32,20 @@ bool Chip8sdl::init() {
 }
 
 void Chip8sdl::run(Chip8& chip8) {
+  const int TIMER_INTERVAL = 1000 / 60; // 60Hz
+  Uint64 lastTimer { SDL_GetTicks() };
+
   while (true) {
     handleInput(chip8);
     chip8.cycle();
     updateDisplay(chip8);
+
+    Uint64 now { SDL_GetTicks() };
+    if (now - lastTimer >= TIMER_INTERVAL) {
+      chip8.updateTimers();
+      lastTimer = now;
+    }
+
     SDL_Delay(2);
   }
 }
