@@ -237,3 +237,40 @@ TEST_F(Chip8test, SHL_Vx) {
   EXPECT_EQ(chip.V[0xD], 0xF6);
   EXPECT_EQ(chip.V[0xF], 0x0);
 }
+
+// 9xy0
+TEST_F(Chip8test, SNE_Vx_Vy) {
+  chip.PC = 0x100;
+  chip.V[0xD] = 0x6A;
+  chip.V[0xA] = 0x76;
+  loadOpcode(0x9DA0);
+  EXPECT_EQ(chip.PC, 0x104);
+
+  chip.V[0xA] = 0x6A;
+  loadOpcode(0x9DA0);
+  EXPECT_EQ(chip.PC, 0x106);
+}
+
+// Annn
+TEST_F(Chip8test, LD_I) {
+  loadOpcode(0xA932);
+  EXPECT_EQ(chip.I, 0x932);
+
+  loadOpcode(0xA000);
+  EXPECT_EQ(chip.I, 0x000);
+
+  loadOpcode(0xAFFF);
+  EXPECT_EQ(chip.I, 0xFFF);
+}
+
+// Bnnn
+TEST_F(Chip8test, JP_V0) {
+  chip.V[0x0] = 0xF1;
+  loadOpcode(0xBAA6);
+  EXPECT_EQ(chip.PC, 0xB97);
+
+  chip.V[0x0] = 0xFF;
+  loadOpcode(0xBFFF);
+  EXPECT_EQ(chip.PC, 0x10FE);
+}
+
